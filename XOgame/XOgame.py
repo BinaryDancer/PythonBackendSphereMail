@@ -41,9 +41,7 @@ class XOGame:
     def have_winner(self):
         for i in range(3):
             raw_check = {x for x in self._playground[i]}
-            print(raw_check)
             column_check = {x for x in (self._playground[j][i] for j in range(3))}
-            print(column_check)
             if len(raw_check) == 1:
                 return raw_check.pop()
             if len(column_check) == 1:
