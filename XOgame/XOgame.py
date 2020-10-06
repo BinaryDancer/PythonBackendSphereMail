@@ -1,5 +1,5 @@
 import emoji
-import XOExceptions
+from XOExceptions import BadInput
 
 
 class XOGame:
@@ -19,7 +19,8 @@ class XOGame:
     O_FIG = 0
 
     def __init__(self):
-        self._playground = [[((i * 3) + j) for j in range(1, 4)] for i in range(3)]
+        self._playground = [[((i * 3) + j) for j in range(1, 4)]
+                            for i in range(3)]
         self._player = XOGame.X_FIG
 
     @staticmethod
@@ -35,13 +36,17 @@ class XOGame:
     def show_playground(self):
         for i in range(3):
             print("\t", end="")
-            print(*["   " + XOGame.SYMBOLS[self._playground[i][j]] for j in range(3)], sep="\t|",
-                  end=" \n" if i == 2 else " \n\t{}\n".format("|".join(["  ----\t", "  ----\t", "  ----\t"])))
+            print(*["   " +
+                    XOGame.SYMBOLS[self._playground[i][j]] for j in range(3)],
+                  sep="\t|",
+                  end=" \n" if i == 2 else
+                  " \n\t{}\n".format("|".join(["  ----\t"] * 3)))
 
     def have_winner(self):
         for i in range(3):
             raw_check = {x for x in self._playground[i]}
-            column_check = {x for x in (self._playground[j][i] for j in range(3))}
+            column_check = {x for x in (self._playground[j][i]
+                                        for j in range(3))}
             if len(raw_check) == 1:
                 return raw_check.pop()
             if len(column_check) == 1:
@@ -64,32 +69,40 @@ class XOGame:
         try:
             data = int(data)
         except ValueError:
-            raise XOExceptions.BadInput("Incorrect input.\nEnter a correct number:")
+            raise BadInput(
+                "Incorrect input.\n"
+                "Enter a correct number:")
         if 1 <= data <= 9:
             x, y = XOGame.get_coordinate(data)
             if self._playground[x][y] in (0, -1):
-                raise XOExceptions.BadInput("This number of the field is already occupied.\nEnter another one:")
+                raise BadInput(
+                    "This number of the field is already occupied.\n"
+                    "Enter another one:")
             return x, y
         else:
-            raise XOExceptions.BadInput("This number of the field doesn't exist.\nEnter a correct one:")
+            raise BadInput(
+                "This number of the field doesn't exist.\n"
+                "Enter a correct one:")
 
     def change_turn(self):
         self._player = - ((self._player + 1) % 2)
 
     def start_game(self):
-        print("Let's start playing {x} {o} -game!".format(x=XOGame.SYMBOLS[-1], o=XOGame.SYMBOLS[0]))
+        print("Let's start playing {x} {o} -game!".format(x=XOGame.SYMBOLS[-1],
+                                                          o=XOGame.SYMBOLS[0]))
 
         winner = False
         while winner is False:
             self.show_playground()
-            print("Enter number of the field to put {} ".format(XOGame.SYMBOLS[self._player]))
+            print("Enter number of the field to put {} ".format(
+                XOGame.SYMBOLS[self._player]))
             ok = False
             while not ok:
                 data = input()
                 ok = True
                 try:
                     x, y = self.validate(data)
-                except XOExceptions.BadInput as ex:
+                except BadInput as ex:
                     ok = False
                     print(ex)
             self.put_figure(x, y)
@@ -100,4 +113,5 @@ class XOGame:
         if winner is None:
             print("It draw guys, try again")
         else:
-            print("{player}!!!We have WINNER!!! {player}".format(player=(XOGame.SYMBOLS[winner] + " ") * 3))
+            print("{player}!!!We have WINNER!!! {player}".format(
+                player=(XOGame.SYMBOLS[winner] + " ") * 3))
